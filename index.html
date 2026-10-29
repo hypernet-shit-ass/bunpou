@@ -264,7 +264,14 @@ $('#ghon').onclick=()=>{
 $('#ghoff').onclick=()=>{gh=null;try{localStorage.removeItem(GK);}catch(e){}$('#ghtoken').value='';ghmsg('Terputus. Progres tetap tersimpan di browser ini.');};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&ghTimer)ghPush();});
 ghFill();
-if(gh)ghSync();
+async function ghPublicLoad(){
+  if(!/^https?:/.test(location.protocol))return;
+  try{const r=await fetch('progress.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
+    const j=await r.json();
+    if(j&&j.code&&(j.ts||0)>ts&&apply(j.code,j.ts))ghmsg('Progres dimuat dari repo (mode baca saja). Hubungkan token agar perubahan ikut tersimpan.');
+  }catch(e){}
+}
+if(gh)ghSync();else ghPublicLoad();
 </script>
 </body>
 </html>
